@@ -74,7 +74,7 @@ npm install
 Create `.env` file in root directory:
 ```env
 # Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=cluster
+MONGODB_URI=mongodb+srv://<YOUR_USER>:<YOUR_PASS>@<YOUR_CLUSTER>.mongodb.net/
 
 # Serial Communication (Arduino)
 COM_PORT=COM7

@@ -306,7 +306,7 @@ PHASE 5: ADMIN MONITORING
 │  │     └─ { total, updatedAt } [Singleton]                 │   │
 │  │                                                            │   │
 │  │  Connection String:                                        │   │
-│  │  mongodb+srv://user:pass@cluster.mongodb.net/?...        │   │
+│  │  mongodb+srv://<YOUR_USER>:<YOUR_PASS>@<CLUSTER>.net/    │   │
 │  └────────────────────────────────────────────────────────────┘   │
 │                                                                     │
 ├──────────────────────────────────────────────────────────────────────┤

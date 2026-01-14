@@ -351,7 +351,7 @@ npm run dev
 ### .env File Setup
 ```env
 # Database
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/
+MONGODB_URI=mongodb+srv://<YOUR_USER>:<YOUR_PASS>@<YOUR_CLUSTER>.mongodb.net/
 
 # Hardware
 COM_PORT=COM7                    # Arduino serial port
