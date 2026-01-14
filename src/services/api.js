@@ -1,5 +1,6 @@
 // API service functions for Smart Cart
 // Updated for ESP32 + Barcode Scanner architecture
+// Production Backend: https://unimart-backend-hz8v.onrender.com
 
 // Dynamic API URL:
 // - With explicit VITE_API_URL: use that URL
@@ -7,6 +8,8 @@
 // - In development: use empty string (Vite proxy)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
   (window.location.hostname !== 'localhost' ? 'https://unimart-backend-hz8v.onrender.com' : '');
+
+console.log('[API] Using backend:', API_BASE_URL || 'local proxy');
 
 const api = {};
 
