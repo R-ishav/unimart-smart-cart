@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 // import { SerialPort, ReadlineParser } from 'serialport';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
@@ -97,12 +96,12 @@ function recalculateTotal(cart) {
   return cart.total;
 }
 
-// Initialize Gmail OAuth2 email service
-let transporter;
-const OAuth2 = google.auth.OAuth2;
+// Initialize Gmail REST API (uses HTTPS port 443, not blocked on Render)
+let gmail;
+let oauth2Client;
 
 if (GMAIL_CLIENT_ID && GMAIL_CLIENT_SECRET && GMAIL_REFRESH_TOKEN) {
-  const oauth2Client = new OAuth2(
+  oauth2Client = new google.auth.OAuth2(
     GMAIL_CLIENT_ID,
     GMAIL_CLIENT_SECRET,
     'https://developers.google.com/oauthplayground'
@@ -112,29 +111,26 @@ if (GMAIL_CLIENT_ID && GMAIL_CLIENT_SECRET && GMAIL_REFRESH_TOKEN) {
     refresh_token: GMAIL_REFRESH_TOKEN
   });
 
-  // Create transporter with OAuth2
-  async function createTransporter() {
-    try {
-      const accessToken = await oauth2Client.getAccessToken();
-      transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          type: 'OAuth2',
-          user: GMAIL_USER,
-          clientId: GMAIL_CLIENT_ID,
-          clientSecret: GMAIL_CLIENT_SECRET,
-          refreshToken: GMAIL_REFRESH_TOKEN,
-          accessToken: accessToken.token,
-        },
-      });
-      console.log('[Startup] Gmail OAuth2 email service initialized for', GMAIL_USER);
-    } catch (err) {
-      console.error('[Startup] Gmail OAuth2 setup error:', err.message);
-    }
-  }
-  createTransporter();
+  gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+  console.log('[Startup] Gmail REST API initialized for', GMAIL_USER);
 } else {
   console.log('[Startup] Email service not configured (provide GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN)');
+}
+
+// Helper function to create email in RFC 2822 format
+function createEmail(to, subject, htmlContent) {
+  const messageParts = [
+    `From: UniMart <${GMAIL_USER}>`,
+    `To: ${to}`,
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+    `Subject: ${subject}`,
+    '',
+    htmlContent
+  ];
+  const message = messageParts.join('\n');
+  // Encode in base64url format
+  return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 // Initialize Razorpay (optional if keys are provided)
@@ -179,9 +175,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Helper function to send receipt email using Gmail OAuth2
+// Helper function to send receipt email using Gmail REST API
 async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentMethod) {
-  if (!transporter) {
+  if (!gmail) {
     console.log('[Email] Email service not configured, skipping email');
     return;
   }
@@ -261,14 +257,17 @@ async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentM
       </html>
     `;
 
-    const info = await transporter.sendMail({
-      from: `UniMart <${GMAIL_USER}>`,
-      to: email,
-      subject: `UniMart Receipt - ${cartId}`,
-      html: htmlContent,
+    // Create and send email using Gmail REST API
+    const encodedMessage = createEmail(email, `UniMart Receipt - ${cartId}`, htmlContent);
+    
+    const response = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
     });
 
-    console.log('[Email] Receipt sent successfully to', email, 'ID:', info.messageId);
+    console.log('[Email] Receipt sent successfully to', email, 'ID:', response.data.id);
   } catch (err) {
     console.error('[Email Error] Failed to send receipt:', err.message);
   }
