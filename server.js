@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 // import { SerialPort, ReadlineParser } from 'serialport';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -29,6 +29,7 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 // ========================================
 // PRODUCT INVENTORY - Load from CSV
@@ -94,19 +95,13 @@ function recalculateTotal(cart) {
   return cart.total;
 }
 
-// Initialize Nodemailer transporter
-let transporter;
-if (EMAIL_USER && EMAIL_PASSWORD) {
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASSWORD,
-    },
-  });
-  console.log('[Startup] Email service initialized');
+// Initialize Resend email service (works on cloud platforms)
+let resend;
+if (RESEND_API_KEY) {
+  resend = new Resend(RESEND_API_KEY);
+  console.log('[Startup] Resend email service initialized');
 } else {
-  console.log('[Startup] Email service not configured (provide EMAIL_USER and EMAIL_PASSWORD)');
+  console.log('[Startup] Email service not configured (provide RESEND_API_KEY)');
 }
 
 // Initialize Razorpay (optional if keys are provided)
@@ -151,23 +146,26 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Helper function to send receipt email
+// Helper function to send receipt email using Resend
 async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentMethod) {
-  if (!transporter) {
+  if (!resend) {
     console.log('[Email] Email service not configured, skipping email');
     return;
   }
 
   try {
     const itemsHTML = items
-      .map(item => `
+      .map(item => {
+        const qty = item.quantity || item.qty || 1;
+        return `
         <tr>
           <td style="padding: 10px; border-bottom: 1px solid #d9f99d;">${item.name}</td>
           <td style="padding: 10px; text-align: right; border-bottom: 1px solid #d9f99d;">₹${item.price.toFixed(2)}</td>
-          <td style="padding: 10px; text-align: right; border-bottom: 1px solid #d9f99d;">${item.quantity}</td>
-          <td style="padding: 10px; text-align: right; border-bottom: 1px solid #d9f99d;">₹${(item.price * item.quantity).toFixed(2)}</td>
+          <td style="padding: 10px; text-align: right; border-bottom: 1px solid #d9f99d;">${qty}</td>
+          <td style="padding: 10px; text-align: right; border-bottom: 1px solid #d9f99d;">₹${(item.price * qty).toFixed(2)}</td>
         </tr>
-      `)
+      `;
+      })
       .join('');
 
     const htmlContent = `
@@ -190,7 +188,7 @@ async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentM
       <body>
         <div class="container">
           <div class="header">
-            <h1>Smart Cart Receipt</h1>
+            <h1>UniMart Receipt</h1>
             <p>Thank you for your purchase!</p>
           </div>
           <div class="content">
@@ -222,7 +220,7 @@ async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentM
             </div>
           </div>
           <div class="footer">
-            <p>Thank you for shopping with Smart Cart!</p>
+            <p>Thank you for shopping with UniMart!</p>
             <p>This is an electronically generated receipt.</p>
           </div>
         </div>
@@ -230,14 +228,18 @@ async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentM
       </html>
     `;
 
-    await transporter.sendMail({
-      from: EMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: 'UniMart <onboarding@resend.dev>',
       to: email,
-      subject: `Smart Cart Receipt - ${cartId}`,
+      subject: `UniMart Receipt - ${cartId}`,
       html: htmlContent,
     });
 
-    console.log('[Email] Receipt sent successfully to', email);
+    if (error) {
+      console.error('[Email Error]', error);
+    } else {
+      console.log('[Email] Receipt sent successfully to', email, 'ID:', data.id);
+    }
   } catch (err) {
     console.error('[Email Error] Failed to send receipt:', err.message);
   }
