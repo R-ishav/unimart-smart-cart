@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-// Dynamic API URL - uses Vite proxy in development
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Dynamic API URL - uses Render backend in production, Vite proxy in development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname !== 'localhost' ? 'https://unimart-backend-hz8v.onrender.com' : '');
 
 export default function PaymentPage() {
   const location = useLocation();

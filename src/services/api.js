@@ -2,10 +2,11 @@
 // Updated for ESP32 + Barcode Scanner architecture
 
 // Dynamic API URL:
-// - In development with Vite proxy: use empty string (relative URLs)
 // - With explicit VITE_API_URL: use that URL
-// - In production: use same origin
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// - In production (Vercel): use Render backend
+// - In development: use empty string (Vite proxy)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname !== 'localhost' ? 'https://unimart-backend-hz8v.onrender.com' : '');
 
 const api = {};
 
