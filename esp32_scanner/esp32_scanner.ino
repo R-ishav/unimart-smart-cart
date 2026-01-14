@@ -35,8 +35,11 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";   // Replace with your WiFi pa
 // ========================================
 // Backend Server Configuration
 // ========================================
-const char* SERVER_IP = "192.168.1.100";  // Replace with your PC's IP address
-const int SERVER_PORT = 3000;
+// Use PUBLIC URL for deployed backend (Render.com)
+const char* SERVER_URL = "https://unimart-backend-hz8v.onrender.com/api/scan";
+// For LOCAL testing, uncomment this instead:
+// const char* SERVER_URL = "http://192.168.1.100:3000/api/scan";
+
 const char* CART_ID = "CART001";          // Default cart ID
 
 // ========================================
@@ -163,12 +166,11 @@ void sendToBackend(String barcode) {
   
   HTTPClient http;
   
-  // Build URL
-  String url = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT) + "/api/scan";
-  Serial.println("[HTTP] Sending to: " + url);
+  // Use the configured server URL
+  Serial.println("[HTTP] Sending to: " + String(SERVER_URL));
   
   // Begin HTTP connection
-  http.begin(url);
+  http.begin(SERVER_URL);
   http.addHeader("Content-Type", "application/json");
   
   // Build JSON payload
