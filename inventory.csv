@@ -1,0 +1,29 @@
+barcode,name,category,price
+8901000000011,White Bread,Bakery,45
+8901000000012,Whole Wheat Bread,Bakery,55
+8901000000021,Milk 500ml,Dairy,30
+8901000000022,Milk 1L,Dairy,55
+8901000000023,Butter 100g,Dairy,75
+8901000000024,Cheese Slice,Dairy,95
+8901000000031,Eggs (6 pack),Eggs,60
+8901000000032,Eggs (12 pack),Eggs,110
+8901000000041,Rice 1kg,Grains,80
+8901000000042,Wheat Flour 1kg,Grains,50
+8901000000051,Cooking Oil 1L,Cooking,145
+8901000000052,Olive Oil 500ml,Cooking,350
+8901000000061,Sugar 1kg,Essentials,45
+8901000000062,Salt 1kg,Essentials,25
+8901000000071,Tea 250g,Beverages,150
+8901000000072,Coffee 200g,Beverages,275
+8901000000081,Biscuits,Snacks,30
+8901000000082,Chips,Snacks,35
+8901000000083,Chocolate Bar,Snacks,45
+8901000000091,Apple (1kg),Fruits,180
+8901000000092,Banana (dozen),Fruits,50
+8901000000093,Orange (1kg),Fruits,120
+8901000000101,Potato (1kg),Vegetables,40
+8901000000102,Onion (1kg),Vegetables,35
+8901000000103,Tomato (1kg),Vegetables,45
+1234567890123,Test Product,Testing,99
+0000000000001,Demo Item 1,Demo,10
+0000000000002,Demo Item 2,Demo,20
