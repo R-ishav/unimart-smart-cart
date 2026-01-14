@@ -39,7 +39,7 @@ export default function LandingPage() {
           onDecodeError: () => {
             // Silently ignore decode errors
           },
-          preferredCamera: 'user', // Use front camera for PC
+          preferredCamera: 'environment', // Use back camera for mobile devices
           highlightCodeOutlineColor: 'rgb(249, 115, 22)',
           highlightScanRegion: true,
         }
