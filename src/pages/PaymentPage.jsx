@@ -66,47 +66,37 @@ export default function PaymentPage() {
           email,
           contact: phone,
         },
-        handler: async (response) => {
-          // Verify payment on backend
-          try {
-            const verifyResponse = await fetch(`${API_BASE_URL}/api/payment/verify`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                cartId,
-                email,
-                items,
-                total,
-                paymentMethod: 'ONLINE',
-              }),
-            });
+        handler: (response) => {
+          // Payment successful - navigate to receipt immediately
+          // Backend verification happens in background
+          console.log('Razorpay payment successful:', response.razorpay_payment_id);
+          
+          // Fire and forget - verify in background
+          fetch(`${API_BASE_URL}/api/payment/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              cartId,
+              email,
+              items,
+              total,
+              paymentMethod: 'ONLINE',
+            }),
+          }).catch(err => console.log('Verification background error:', err));
 
-            // Navigate to receipt regardless of verification (payment already completed)
-            navigate('/receipt', {
-              state: {
-                cartId,
-                items,
-                total,
-                paymentId: response.razorpay_payment_id,
-                email,
-              },
-            });
-          } catch (err) {
-            console.error('Verification error:', err);
-            // Still navigate to receipt - payment was successful
-            navigate('/receipt', {
-              state: {
-                cartId,
-                items,
-                total,
-                paymentId: response.razorpay_payment_id,
-                email,
-              },
-            });
-          }
+          // Navigate immediately
+          navigate('/receipt', {
+            state: {
+              cartId,
+              items,
+              total,
+              paymentId: response.razorpay_payment_id,
+              email,
+            },
+          });
         },
         modal: {
           ondismiss: () => {
