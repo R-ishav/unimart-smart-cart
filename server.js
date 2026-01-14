@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 // import { SerialPort, ReadlineParser } from 'serialport';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -27,9 +28,10 @@ const ALLOW_ALL_ORIGINS = process.env.ALLOW_ALL_ORIGINS === 'true'; // For ngrok
 const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173').split(',');
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
-const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID;
+const GMAIL_CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET;
+const GMAIL_REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN;
+const GMAIL_USER = process.env.GMAIL_USER || 'thankyou.unimart@gmail.com';
 
 // ========================================
 // PRODUCT INVENTORY - Load from CSV
@@ -95,13 +97,44 @@ function recalculateTotal(cart) {
   return cart.total;
 }
 
-// Initialize Resend email service (works on cloud platforms)
-let resend;
-if (RESEND_API_KEY) {
-  resend = new Resend(RESEND_API_KEY);
-  console.log('[Startup] Resend email service initialized');
+// Initialize Gmail OAuth2 email service
+let transporter;
+const OAuth2 = google.auth.OAuth2;
+
+if (GMAIL_CLIENT_ID && GMAIL_CLIENT_SECRET && GMAIL_REFRESH_TOKEN) {
+  const oauth2Client = new OAuth2(
+    GMAIL_CLIENT_ID,
+    GMAIL_CLIENT_SECRET,
+    'https://developers.google.com/oauthplayground'
+  );
+  
+  oauth2Client.setCredentials({
+    refresh_token: GMAIL_REFRESH_TOKEN
+  });
+
+  // Create transporter with OAuth2
+  async function createTransporter() {
+    try {
+      const accessToken = await oauth2Client.getAccessToken();
+      transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: GMAIL_USER,
+          clientId: GMAIL_CLIENT_ID,
+          clientSecret: GMAIL_CLIENT_SECRET,
+          refreshToken: GMAIL_REFRESH_TOKEN,
+          accessToken: accessToken.token,
+        },
+      });
+      console.log('[Startup] Gmail OAuth2 email service initialized for', GMAIL_USER);
+    } catch (err) {
+      console.error('[Startup] Gmail OAuth2 setup error:', err.message);
+    }
+  }
+  createTransporter();
 } else {
-  console.log('[Startup] Email service not configured (provide RESEND_API_KEY)');
+  console.log('[Startup] Email service not configured (provide GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN)');
 }
 
 // Initialize Razorpay (optional if keys are provided)
@@ -146,9 +179,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Helper function to send receipt email using Resend
+// Helper function to send receipt email using Gmail OAuth2
 async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentMethod) {
-  if (!resend) {
+  if (!transporter) {
     console.log('[Email] Email service not configured, skipping email');
     return;
   }
@@ -228,18 +261,14 @@ async function sendReceiptEmail(email, cartId, items, total, paymentId, paymentM
       </html>
     `;
 
-    const { data, error } = await resend.emails.send({
-      from: 'UniMart <onboarding@resend.dev>',
+    const info = await transporter.sendMail({
+      from: `UniMart <${GMAIL_USER}>`,
       to: email,
       subject: `UniMart Receipt - ${cartId}`,
       html: htmlContent,
     });
 
-    if (error) {
-      console.error('[Email Error]', error);
-    } else {
-      console.log('[Email] Receipt sent successfully to', email, 'ID:', data.id);
-    }
+    console.log('[Email] Receipt sent successfully to', email, 'ID:', info.messageId);
   } catch (err) {
     console.error('[Email Error] Failed to send receipt:', err.message);
   }
