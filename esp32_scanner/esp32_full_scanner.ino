@@ -32,7 +32,14 @@ const char* WIFI_PASSWORD = "20202020";
 // Backend Server Configuration
 // ========================================
 const char* SERVER_URL = "https://unimart-backend-hz8v.onrender.com/api/scan";
+const char* STATUS_URL = "https://unimart-backend-hz8v.onrender.com/api/cart/";
 const char* CART_ID = "101";  // Valid: 101 to 110
+
+// Status polling
+unsigned long lastStatusCheck = 0;
+const unsigned long STATUS_CHECK_INTERVAL = 2000;  // Check every 2 seconds
+String lastCheckoutStatus = "idle";
+int dotCount = 0;
 
 // ========================================
 // LCD Configuration (I2C address 0x27 or 0x3F)
@@ -76,6 +83,7 @@ void setup() {
 // Main Loop
 // ========================================
 void loop() {
+  // Check for barcode scans
   if (Serial2.available()) {
     String code = Serial2.readStringUntil('\n');
     code.trim();
@@ -98,6 +106,12 @@ void loop() {
       // Send to backend and get product info
       sendToBackend(code);
     }
+  }
+  
+  // Poll for checkout status every 2 seconds
+  if (millis() - lastStatusCheck > STATUS_CHECK_INTERVAL) {
+    lastStatusCheck = millis();
+    checkCartStatus();
   }
 }
 
@@ -232,4 +246,79 @@ void sendToBackend(String barcode) {
   lcd.print("Scan Next Item");
   lcd.setCursor(0, 1);
   lcd.print("...");
+}
+// ========================================
+// Check Cart Status for Payment Updates
+// ========================================
+void checkCartStatus() {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
+
+  HTTPClient http;
+  String url = String(STATUS_URL) + String(CART_ID) + "/status";
+  http.begin(url);
+  
+  int httpCode = http.GET();
+  
+  if (httpCode == 200) {
+    String response = http.getString();
+    
+    StaticJsonDocument<256> doc;
+    DeserializationError error = deserializeJson(doc, response);
+    
+    if (!error) {
+      String checkoutStatus = doc["checkoutStatus"].as<String>();
+      
+      // Only update LCD if status changed or if showing animation
+      if (checkoutStatus != lastCheckoutStatus || checkoutStatus == "processing") {
+        lastCheckoutStatus = checkoutStatus;
+        
+        if (checkoutStatus == "checkout") {
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("Payment Ongoing");
+          lcd.setCursor(0, 1);
+          lcd.print("Please wait...");
+          
+        } else if (checkoutStatus == "processing") {
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("Processing");
+          lcd.setCursor(0, 1);
+          // Animated dots
+          dotCount = (dotCount + 1) % 4;
+          String dots = "";
+          for (int i = 0; i < dotCount; i++) dots += ".";
+          lcd.print("Payment" + dots);
+          
+        } else if (checkoutStatus == "success") {
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("   Payment    ");
+          lcd.setCursor(0, 1);
+          lcd.print("  Successful!  ");
+          
+        } else if (checkoutStatus == "receipt") {
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("   Receipt    ");
+          lcd.setCursor(0, 1);
+          lcd.print("  Generated!   ");
+          
+        } else if (checkoutStatus == "idle") {
+          // Only show ready message if we were in a different state
+          if (lastCheckoutStatus != "idle") {
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Smart Shopping");
+            lcd.setCursor(0, 1);
+            lcd.print("Scan Product...");
+          }
+        }
+      }
+    }
+  }
+  
+  http.end();
 }

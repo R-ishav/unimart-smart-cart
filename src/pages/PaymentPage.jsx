@@ -5,6 +5,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
   (window.location.hostname !== 'localhost' ? 'https://unimart-backend-hz8v.onrender.com' : '');
 
+// Helper to update checkout status for LCD
+const updateCheckoutStatus = async (cartId, status) => {
+  try {
+    await fetch(`${API_BASE_URL}/api/cart/${cartId}/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+  } catch (err) {
+    console.log('Status update error:', err);
+  }
+};
+
 export default function PaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +50,9 @@ export default function PaymentPage() {
 
     setProcessing(true);
     setError('');
+    
+    // Update LCD: Payment ongoing
+    await updateCheckoutStatus(cartId, 'checkout');
 
     try {
       // Create order on backend
@@ -53,6 +69,9 @@ export default function PaymentPage() {
 
       if (!response.ok) throw new Error('Failed to create order');
       const { orderId, key } = await response.json();
+      
+      // Update LCD: Processing payment
+      await updateCheckoutStatus(cartId, 'processing');
 
       // Initialize Razorpay
       const options = {
@@ -66,7 +85,10 @@ export default function PaymentPage() {
           email,
           contact: phone,
         },
-        handler: (response) => {
+        handler: async (response) => {
+          // Update LCD: Payment successful
+          await updateCheckoutStatus(cartId, 'success');
+          
           // Payment successful - navigate to receipt immediately
           // Backend verification happens in background
           console.log('Razorpay payment successful:', response.razorpay_payment_id);
@@ -87,6 +109,12 @@ export default function PaymentPage() {
             }),
           }).catch(err => console.log('Verification background error:', err));
 
+          // Update LCD: Receipt generated
+          setTimeout(() => updateCheckoutStatus(cartId, 'receipt'), 1000);
+          
+          // Reset LCD after 5 seconds
+          setTimeout(() => updateCheckoutStatus(cartId, 'idle'), 5000);
+
           // Navigate immediately
           navigate('/receipt', {
             state: {
@@ -101,6 +129,7 @@ export default function PaymentPage() {
         modal: {
           ondismiss: () => {
             setProcessing(false);
+            updateCheckoutStatus(cartId, 'idle');
           },
         },
       };
@@ -116,8 +145,14 @@ export default function PaymentPage() {
   const handleCashPayment = async () => {
     setProcessing(true);
     setError('');
+    
+    // Update LCD: Payment ongoing
+    await updateCheckoutStatus(cartId, 'checkout');
 
     try {
+      // Update LCD: Processing
+      await updateCheckoutStatus(cartId, 'processing');
+      
       // Create cash payment transaction
       const response = await fetch(`${API_BASE_URL}/api/payment/cash`, {
         method: 'POST',
@@ -134,6 +169,15 @@ export default function PaymentPage() {
 
       if (!response.ok) throw new Error('Failed to process cash payment');
       const { transactionId } = await response.json();
+      
+      // Update LCD: Payment successful
+      await updateCheckoutStatus(cartId, 'success');
+      
+      // Update LCD: Receipt generated
+      setTimeout(() => updateCheckoutStatus(cartId, 'receipt'), 1000);
+      
+      // Reset LCD after 5 seconds
+      setTimeout(() => updateCheckoutStatus(cartId, 'idle'), 5000);
 
       navigate('/receipt', {
         state: {
@@ -148,6 +192,7 @@ export default function PaymentPage() {
     } catch (err) {
       setError(err.message || 'Payment processing failed');
       setProcessing(false);
+      updateCheckoutStatus(cartId, 'idle');
     }
   };
 

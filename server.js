@@ -91,6 +91,7 @@ function resetAllCarts() {
       total: 0,
       paymentStatus: false,
       verifiedStatus: false,
+      checkoutStatus: 'idle',  // idle, checkout, processing, success, receipt
     };
   });
   console.log('[Cart] All carts have been reset!');
@@ -107,6 +108,7 @@ function getOrCreateCart(cartId) {
       total: 0,
       paymentStatus: false,
       verifiedStatus: false,
+      checkoutStatus: 'idle',  // idle, checkout, processing, success, receipt
     };
     console.log(`[Cart] Created new cart: ${cartId}`);
   }
@@ -382,6 +384,36 @@ app.get('/api/cart/:cartId', (req, res) => {
   const { cartId } = req.params;
   const cart = getOrCreateCart(cartId);
   res.json(cart);
+});
+
+// GET /api/cart/:cartId/status - Get cart status for ESP32 LCD
+app.get('/api/cart/:cartId/status', (req, res) => {
+  const { cartId } = req.params;
+  const cart = getOrCreateCart(cartId);
+  if (!cart) {
+    return res.status(400).json({ error: 'Invalid cart ID' });
+  }
+  res.json({ 
+    cartId: cart.cartId,
+    checkoutStatus: cart.checkoutStatus,
+    total: cart.total,
+    itemCount: cart.items.reduce((sum, item) => sum + item.qty, 0)
+  });
+});
+
+// POST /api/cart/:cartId/checkout - Set checkout status
+app.post('/api/cart/:cartId/checkout', (req, res) => {
+  const { cartId } = req.params;
+  const { status } = req.body;  // checkout, processing, success, receipt, idle
+  
+  const cart = getOrCreateCart(cartId);
+  if (!cart) {
+    return res.status(400).json({ error: 'Invalid cart ID' });
+  }
+  
+  cart.checkoutStatus = status || 'checkout';
+  console.log(`[Cart ${cartId}] Checkout status: ${cart.checkoutStatus}`);
+  res.json({ success: true, checkoutStatus: cart.checkoutStatus });
 });
 
 // POST /api/cart/:cartId/remove - Remove item from cart
