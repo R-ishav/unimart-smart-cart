@@ -437,6 +437,26 @@ app.post('/api/cart/:cartId/remove', (req, res) => {
   res.json(cart);
 });
 
+// POST /api/cart/:cartId/clear - Clear cart after payment
+app.post('/api/cart/:cartId/clear', (req, res) => {
+  const { cartId } = req.params;
+  
+  const cart = getOrCreateCart(cartId);
+  if (!cart) {
+    return res.status(400).json({ error: 'Invalid cart ID' });
+  }
+  
+  // Reset cart to empty state
+  cart.items = [];
+  cart.total = 0;
+  cart.paymentStatus = false;
+  cart.verifiedStatus = false;
+  cart.checkoutStatus = 'idle';
+  
+  console.log(`[Cart] Cart ${cartId} cleared after payment`);
+  res.json({ success: true, message: 'Cart cleared', cart });
+});
+
 // POST /api/pay - Mark cart as paid
 app.post('/api/pay', (req, res) => {
   const { cartId } = req.body;

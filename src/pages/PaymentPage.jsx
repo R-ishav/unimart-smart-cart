@@ -18,6 +18,18 @@ const updateCheckoutStatus = async (cartId, status) => {
   }
 };
 
+// Helper to clear cart after payment
+const clearCart = async (cartId) => {
+  try {
+    await fetch(`${API_BASE_URL}/api/cart/${cartId}/clear`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    console.log('Cart clear error:', err);
+  }
+};
+
 export default function PaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -114,6 +126,9 @@ export default function PaymentPage() {
           
           // Reset LCD after 5 seconds
           setTimeout(() => updateCheckoutStatus(cartId, 'idle'), 5000);
+          
+          // Clear cart after successful payment
+          await clearCart(cartId);
 
           // Navigate immediately
           navigate('/receipt', {
@@ -178,6 +193,9 @@ export default function PaymentPage() {
       
       // Reset LCD after 5 seconds
       setTimeout(() => updateCheckoutStatus(cartId, 'idle'), 5000);
+      
+      // Clear cart after successful payment
+      await clearCart(cartId);
 
       navigate('/receipt', {
         state: {
