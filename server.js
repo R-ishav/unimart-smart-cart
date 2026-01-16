@@ -73,11 +73,33 @@ function loadInventory() {
 loadInventory();
 
 // ========================================
-// CART SESSIONS - In-memory storage
+// CART SESSIONS - In-memory storage (Limited to 10 carts: 101-110)
 // ========================================
+const VALID_CART_IDS = ['101', '102', '103', '104', '105', '106', '107', '108', '109', '110'];
+const RESET_BARCODE = '0000000000000';  // Special barcode to reset all carts
 const carts = {};  // cartId -> { cartId, items: [], total, paymentStatus, verifiedStatus }
 
+function isValidCartId(cartId) {
+  return VALID_CART_IDS.includes(cartId);
+}
+
+function resetAllCarts() {
+  VALID_CART_IDS.forEach(cartId => {
+    carts[cartId] = {
+      cartId,
+      items: [],
+      total: 0,
+      paymentStatus: false,
+      verifiedStatus: false,
+    };
+  });
+  console.log('[Cart] All carts have been reset!');
+}
+
 function getOrCreateCart(cartId) {
+  if (!isValidCartId(cartId)) {
+    return null;  // Invalid cart ID
+  }
   if (!carts[cartId]) {
     carts[cartId] = {
       cartId,
@@ -291,6 +313,16 @@ app.post('/api/scan', async (req, res) => {
     
     console.log(`[Scan] Received: barcode=${barcode}, cartId=${cartId}`);
     
+    // Check for reset barcode
+    if (barcode === RESET_BARCODE) {
+      resetAllCarts();
+      return res.json({ 
+        success: true, 
+        message: 'All carts have been reset!',
+        resetted: VALID_CART_IDS 
+      });
+    }
+    
     // Lookup product by barcode
     const product = products[barcode];
     if (!product) {
@@ -300,6 +332,12 @@ app.post('/api/scan', async (req, res) => {
     
     // Get or create cart
     const cart = getOrCreateCart(cartId);
+    
+    // Check if valid cart ID (101-110)
+    if (!cart) {
+      console.log(`[Scan] Invalid cart ID: ${cartId}`);
+      return res.status(400).json({ error: 'Invalid cart ID. Use 101 to 110', cartId });
+    }
     
     // Check if product already in cart
     const existingItem = cart.items.find(item => item.barcode === barcode);

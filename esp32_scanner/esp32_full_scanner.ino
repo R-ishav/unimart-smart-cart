@@ -23,16 +23,16 @@
 #include <ArduinoJson.h>
 
 // ========================================
-// WiFi Configuration
+// WiFi Configuration (Phone Hotspot)
 // ========================================
-const char* WIFI_SSID = "RRaj";
-const char* WIFI_PASSWORD = "30303030";
+const char* WIFI_SSID = "raj";
+const char* WIFI_PASSWORD = "20202020";
 
 // ========================================
 // Backend Server Configuration
 // ========================================
 const char* SERVER_URL = "https://unimart-backend-hz8v.onrender.com/api/scan";
-const char* CART_ID = "CART001";
+const char* CART_ID = "101";  // Valid: 101 to 110
 
 // ========================================
 // LCD Configuration (I2C address 0x27 or 0x3F)
@@ -108,10 +108,11 @@ void connectWiFi() {
   Serial.print("[WiFi] Connecting to ");
   Serial.println(WIFI_SSID);
 
+  WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+  while (WiFi.status() != WL_CONNECTED && attempts < 30) {
     delay(500);
     Serial.print(".");
     attempts++;
@@ -197,8 +198,6 @@ void sendToBackend(String barcode) {
         lcd.setCursor(0, 1);
         lcd.print("Rs.");
         lcd.print(price, 0);
-        lcd.print(" T:");
-        lcd.print(total, 0);
 
         Serial.println("[Success] Added: " + name + " Rs." + String(price));
       }
