@@ -272,6 +272,7 @@ void checkCartStatus() {
       
       // Only update LCD if status changed or if showing animation
       if (checkoutStatus != lastCheckoutStatus || checkoutStatus == "processing") {
+        String previousStatus = lastCheckoutStatus;  // Save previous state
         lastCheckoutStatus = checkoutStatus;
         
         if (checkoutStatus == "checkout") {
@@ -307,8 +308,8 @@ void checkCartStatus() {
           lcd.print("  Generated!   ");
           
         } else if (checkoutStatus == "idle") {
-          // Only show ready message if we were in a different state
-          if (lastCheckoutStatus != "idle") {
+          // Show ready message when coming back from payment
+          if (previousStatus != "idle") {
             lcd.clear();
             lcd.setCursor(0, 0);
             lcd.print("Smart Shopping");
