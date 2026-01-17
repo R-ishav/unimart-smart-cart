@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QrScanner from 'qr-scanner';
 import scannerIcon from '../assets/scanner.png';
-import bgImage from '../assets/Smart cart bg.png';
 
 export default function LandingPage() {
   const videoRef = useRef(null);
@@ -64,7 +63,12 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ backgroundColor: '#f7fee7' }}>
+      {/* Simple lime themed background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" style={{ background: 'linear-gradient(to bottom right, #d9f99d, #bef264)' }}></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" style={{ background: 'linear-gradient(to bottom right, #bef264, #a3e635)' }}></div>
+      </div>
 
       <div className="relative z-10 w-full animate-fadeInUp">
         {/* Header */}
@@ -131,7 +135,7 @@ export default function LandingPage() {
               <div className="w-full border-t" style={{ borderColor: '#d9f99d' }}></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="px-3 text-sm font-medium rounded" style={{ backgroundColor: 'rgba(255,255,255,0.8)', color: '#4b5563' }}>Or enter manually</span>
+              <span className="px-3 text-sm font-medium" style={{ backgroundColor: '#f7fee7', color: '#4b5563' }}>Or enter manually</span>
             </div>
           </div>
 
