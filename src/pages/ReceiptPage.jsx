@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import html2pdf from 'html2pdf.js';
-import bgImage from '../assets/Smart cart bg.png';
 
 export default function ReceiptPage() {
   const location = useLocation();
@@ -48,75 +47,69 @@ export default function ReceiptPage() {
   };
 
   return (
-    <div 
-      className="min-h-screen py-10 flex flex-col items-center justify-center px-6"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
-    >
-      {/* Dark overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 pointer-events-none"></div>
-
-      <div className="relative z-10 max-w-2xl w-full">
+    <div className="min-h-screen py-10 flex flex-col items-center justify-center px-6" style={{ backgroundColor: '#f7fee7' }}>
+      <div className="max-w-2xl w-full">
         {/* Success Header */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/40" style={{ animation: 'float 3s ease-in-out infinite' }}>
-            <span className="text-5xl">✓</span>
-          </div>
-          <h1 className="text-4xl font-black text-white mb-2" style={{ textShadow: '0 0 40px rgba(34, 197, 94, 0.5)' }}>Payment Successful!</h1>
-          <p className="text-green-400 font-medium">Thank you for your purchase</p>
+          <h1 className="text-5xl font-black mb-2" style={{ color: '#65a30d' }}>Payment Successful!</h1>
+          <p className="text-xl" style={{ color: '#65a30d' }}>Thank you for your purchase</p>
         </div>
 
         {/* Receipt Card */}
-        <div className="glass-card rounded-3xl overflow-hidden mb-8" ref={receiptRef}>
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8" ref={receiptRef}>
           {/* Header */}
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-6">
+          <div className="text-white px-8 py-8" style={{ background: 'linear-gradient(to right, #84cc16, #65a30d)' }}>
             <div className="text-center">
-              <h2 className="text-2xl font-bold mb-1">Smart Cart Receipt</h2>
-              <p className="text-green-100 text-sm">Order Receipt & Summary</p>
+              <h2 className="text-3xl font-bold mb-2">Smart Cart Receipt</h2>
+              <p className="text-lime-100 text-sm">Order Receipt & Summary</p>
             </div>
           </div>
 
           {/* Content */}
           <div className="p-8">
             {/* Order Details */}
-            <div className="grid grid-cols-2 gap-6 mb-6 pb-6 border-b border-gray-200">
+            <div className="grid grid-cols-2 gap-6 mb-8 pb-8" style={{ borderBottom: '2px solid #d9f99d' }}>
               <div>
-                <p className="text-xs font-semibold uppercase text-green-600 mb-1">Receipt #</p>
-                <p className="text-lg font-bold text-gray-800">{paymentId || 'N/A'}</p>
+                <p className="text-sm font-semibold uppercase mb-1" style={{ color: '#65a30d' }}>Receipt #</p>
+                <p className="text-2xl font-bold" style={{ color: '#1f2937' }}>{paymentId || 'N/A'}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-semibold uppercase text-green-600 mb-1">Cart ID</p>
-                <p className="text-lg font-bold text-gray-800">{cartId}</p>
+                <p className="text-sm font-semibold uppercase mb-1" style={{ color: '#65a30d' }}>Cart ID</p>
+                <p className="text-2xl font-bold" style={{ color: '#1f2937' }}>{cartId}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase text-green-600 mb-1">Date & Time</p>
-                <p className="font-medium text-gray-800">{currentDate}</p>
+                <p className="text-sm font-semibold uppercase mb-1" style={{ color: '#65a30d' }}>Date & Time</p>
+                <p className="font-semibold" style={{ color: '#1f2937' }}>{currentDate}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-semibold uppercase text-green-600 mb-1">Payment</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${method === 'CASH' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
-                  {method}
-                </span>
+                <p className="text-sm font-semibold uppercase mb-1" style={{ color: '#65a30d' }}>Payment</p>
+                <p className="font-semibold" style={{ color: '#1f2937' }}>{method}</p>
               </div>
             </div>
 
             {/* Items */}
-            <div className="mb-6 pb-6 border-b border-gray-200">
-              <h3 className="text-sm font-bold text-green-600 uppercase tracking-wide mb-4">Items Purchased</h3>
-              <div className="space-y-2">
+            <div className="mb-8 pb-8" style={{ borderBottom: '2px solid #d9f99d' }}>
+              <h3 className="text-lg font-bold mb-4" style={{ color: '#65a30d' }}>
+                Items Purchased
+              </h3>
+              <div className="space-y-3">
                 {items.map((item, idx) => {
                   const quantity = item.qty || item.quantity || 1;
                   return (
-                    <div key={item.barcode || idx} className="flex justify-between items-center p-3 rounded-xl bg-gray-50">
+                    <div key={item.barcode || idx} className="flex justify-between items-center p-4 rounded-lg" style={{ backgroundColor: '#ffffff', border: '2px solid #d9f99d' }}>
                       <div>
-                        <p className="font-semibold text-gray-800">{item.name}</p>
-                        <p className="text-xs text-gray-500">₹{item.price.toFixed(2)} × {quantity}</p>
+                        <p className="font-semibold" style={{ color: '#1f2937' }}>{item.name}</p>
+                        <p className="text-xs" style={{ color: '#6b7280' }}>Unit Price: ₹{item.price.toFixed(2)}</p>
+                        {item.category && (
+                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#f7fee7', color: '#65a30d' }}>{item.category}</span>
+                        )}
                       </div>
-                      <p className="font-bold text-gray-800 text-lg">₹{(item.price * quantity).toFixed(2)}</p>
+                      <div className="text-right">
+                        <p className="text-xs" style={{ color: '#6b7280' }}>Qty: {quantity}</p>
+                        <p className="font-bold text-lg" style={{ color: '#1f2937' }}>
+                          ₹{(item.price * quantity).toFixed(2)}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}
@@ -124,59 +117,74 @@ export default function ReceiptPage() {
             </div>
 
             {/* Totals */}
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-gray-600">
-                <span>Subtotal:</span>
-                <span className="font-semibold text-gray-800">₹{total.toFixed(2)}</span>
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between" style={{ color: '#374151' }}>
+                <span className="font-medium">Subtotal:</span>
+                <span className="font-semibold">₹{total.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Tax (0%):</span>
-                <span className="font-semibold text-gray-800">₹0.00</span>
+              <div className="flex justify-between" style={{ color: '#374151' }}>
+                <span className="font-medium">Tax (0%):</span>
+                <span className="font-semibold">₹0.00</span>
               </div>
-              <div className="flex justify-between items-center p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 mt-4">
-                <span className="text-lg font-bold text-gray-800">Total Amount:</span>
-                <span className="text-3xl font-black text-green-600">₹{total.toFixed(2)}</span>
+              <div className="flex justify-between" style={{ color: '#374151' }}>
+                <span className="font-medium">Discount:</span>
+                <span className="font-semibold">₹0.00</span>
+              </div>
+              <div className="pt-4 flex justify-between items-center p-4 rounded-lg" style={{ borderTop: '2px solid #d9f99d', backgroundColor: '#ffffff', border: '2px solid #d9f99d' }}>
+                <span className="text-lg font-bold" style={{ color: '#1f2937' }}>Total Amount:</span>
+                <span className="text-5xl font-black" style={{ color: '#84cc16' }}>₹{total.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="text-center pt-5 border-t border-gray-200">
-              <p className="font-semibold text-gray-700 mb-2">Thank you for shopping with Smart Cart!</p>
+            <div className="text-center pt-6" style={{ borderTop: '2px solid #d9f99d' }}>
+              <p className="font-semibold mb-2" style={{ color: '#374151' }}>Thank you for shopping with Smart Cart!</p>
               {email && email !== 'walk-in' && email !== 'Walk-in Customer' && (
-                <p className="text-sm text-gray-500">Receipt copy sent to: <span className="font-semibold text-green-600">{email}</span></p>
+                <p className="text-sm" style={{ color: '#6b7280' }}>
+                  Receipt copy sent to: <span className="font-semibold">{email}</span>
+                </p>
               )}
-              <p className="text-xs mt-2 text-gray-400">This is an electronically generated receipt</p>
+              <p className="text-xs mt-2" style={{ color: '#9ca3af' }}>
+                This is an electronically generated receipt
+              </p>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <button
             onClick={printReceipt}
-            className="glass text-white font-bold py-4 px-6 rounded-xl transition-all hover:bg-white/20 flex items-center justify-center gap-2"
+            className="text-white font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+            style={{ backgroundColor: '#84cc16' }}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = '#65a30d'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = '#84cc16'; }}
           >
-            <span>🖨️</span> Print
+            Print Receipt
           </button>
           <button
             onClick={generatePDF}
-            className="glass text-white font-bold py-4 px-6 rounded-xl transition-all hover:bg-white/20 flex items-center justify-center gap-2"
+            className="text-white font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+            style={{ backgroundColor: '#84cc16' }}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = '#65a30d'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = '#84cc16'; }}
           >
-            <span>📄</span> Download PDF
+            Download PDF
           </button>
         </div>
 
         {/* Return Button */}
         <button
           onClick={() => {
+            // Reset cart on backend
             fetch('http://localhost:3000/api/bill/reset', { method: 'POST' });
             navigate('/');
           }}
-          className="w-full btn-modern text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 text-lg"
+          className="w-full text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 text-lg"
+          style={{ background: 'linear-gradient(to right, #84cc16, #65a30d)' }}
+          onMouseEnter={(e) => { e.target.style.background = 'linear-gradient(to right, #65a30d, #5a9c0d)'; }}
+          onMouseLeave={(e) => { e.target.style.background = 'linear-gradient(to right, #84cc16, #65a30d)'; }}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
           Return to Home
         </button>
       </div>

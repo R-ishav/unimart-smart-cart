@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import bgImage from '../assets/Smart cart bg.png';
 
 // Dynamic API URL - uses Render backend in production, Vite proxy in development
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
@@ -216,49 +215,36 @@ export default function PaymentPage() {
   };
 
   return (
-    <div 
-      className="min-h-screen py-10"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
-    >
-      {/* Dark overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 pointer-events-none"></div>
-
+    <div className="min-h-screen py-10" style={{ backgroundColor: '#f7fee7' }}>
       {/* Header */}
-      <div className="relative z-10 glass-dark shadow-2xl border-b border-white/10 mb-10">
-        <div className="max-w-4xl mx-auto px-6 py-6">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-xl">💳</span>
+      <div className="text-white shadow-xl mb-10" style={{ background: 'linear-gradient(to right, #84cc16, #65a30d)' }}>
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <h1 className="text-4xl font-bold flex items-center gap-3">
             Payment Details
           </h1>
         </div>
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6">
+      <div className="max-w-4xl mx-auto px-6">
         {error && (
-          <div className="mb-8 glass-card border-l-4 border-red-500 rounded-xl p-4">
-            <p className="font-semibold text-red-700 flex items-center gap-2">
-              ⚠️ {error}
+          <div className="mb-8 border-l-4 rounded-lg p-4 shadow-md" style={{ borderColor: '#ef4444' }}>
+            <p className="font-semibold flex items-center gap-2" style={{ color: '#b91c1c' }}>
+              <span>⚠️</span> {error}
             </p>
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Payment Form */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* Customer Information */}
-            <div className="glass-card rounded-2xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600">👤</span>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="text-gray-800 px-8 py-6 border-b" style={{ borderColor: '#d9f99d' }}>
+                <h2 className="text-2xl font-bold">
                   Contact Information
                 </h2>
               </div>
-              <div className="p-6 space-y-5">
+              <div className="p-8 space-y-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
                   <input
@@ -266,7 +252,10 @@ export default function PaymentPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="john@example.com"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:bg-white focus:outline-none transition-all font-medium"
+                    className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition font-medium"
+                    style={{ borderColor: '#d9f99d', backgroundColor: '#f7fee7' }}
+                    onFocus={(e) => e.target.style.borderColor = '#84cc16'}
+                    onBlur={(e) => e.target.style.borderColor = '#d9f99d'}
                   />
                 </div>
                 <div>
@@ -276,46 +265,57 @@ export default function PaymentPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="9876543210"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:bg-white focus:outline-none transition-all font-medium"
+                    className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition font-medium"
+                    style={{ borderColor: '#d9f99d', backgroundColor: '#f7fee7' }}
+                    onFocus={(e) => e.target.style.borderColor = '#84cc16'}
+                    onBlur={(e) => e.target.style.borderColor = '#d9f99d'}
                   />
                 </div>
               </div>
             </div>
 
             {/* Payment Method Selection */}
-            <div className="glass-card rounded-2xl overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600">💰</span>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="text-gray-800 px-8 py-6 border-b" style={{ borderColor: '#d9f99d' }}>
+                <h2 className="text-2xl font-bold">
                   Payment Method
                 </h2>
               </div>
-              <div className="p-2">
+              <div className="space-y-2">
                 {/* Razorpay Option */}
                 <button
                   onClick={() => setPaymentMethod('razorpay')}
-                  className={`w-full p-5 rounded-xl transition flex items-center gap-4 text-left mb-2 ${paymentMethod === 'razorpay' ? 'bg-green-50 border-2 border-green-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
+                  className="w-full p-4 border-b transition flex items-start gap-4 text-left hover:bg-gray-50"
+                  style={{ borderColor: '#d9f99d' }}
                 >
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-green-500 bg-green-500' : 'border-gray-300'}`}>
-                    {paymentMethod === 'razorpay' && <span className="text-white text-xs">✓</span>}
-                  </div>
+                  <input 
+                    type="radio" 
+                    checked={paymentMethod === 'razorpay'} 
+                    readOnly 
+                    className="mt-1 flex-shrink-0"
+                    style={{ accentColor: '#84cc16' }}
+                  />
                   <div className="flex-1">
-                    <p className="font-bold text-gray-800">💳 Online Payment</p>
-                    <p className="text-sm text-gray-500 mt-1">Credit Card, Debit Card, UPI, Wallet</p>
+                    <p className="font-semibold text-gray-800 text-sm">💳 Online Payment (Razorpay)</p>
+                    <p className="text-xs text-gray-600 mt-1">Credit Card, Debit Card, UPI, Wallet</p>
                   </div>
                 </button>
 
                 {/* Cash Option */}
                 <button
                   onClick={() => setPaymentMethod('cash')}
-                  className={`w-full p-5 rounded-xl transition flex items-center gap-4 text-left ${paymentMethod === 'cash' ? 'bg-green-50 border-2 border-green-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
+                  className="w-full p-4 transition flex items-start gap-4 text-left hover:bg-gray-50"
                 >
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cash' ? 'border-green-500 bg-green-500' : 'border-gray-300'}`}>
-                    {paymentMethod === 'cash' && <span className="text-white text-xs">✓</span>}
-                  </div>
+                  <input 
+                    type="radio" 
+                    checked={paymentMethod === 'cash'} 
+                    readOnly 
+                    className="mt-1 flex-shrink-0"
+                    style={{ accentColor: '#84cc16' }}
+                  />
                   <div className="flex-1">
-                    <p className="font-bold text-gray-800">💵 Cash Payment</p>
-                    <p className="text-sm text-gray-500 mt-1">Pay at the counter</p>
+                    <p className="font-semibold text-gray-800 text-sm">💵 Cash Payment</p>
+                    <p className="text-xs text-gray-600 mt-1">Pay at the counter</p>
                   </div>
                 </button>
               </div>
@@ -324,51 +324,63 @@ export default function PaymentPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="glass-card rounded-2xl p-6 sticky top-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600">📋</span>
+            <div className="rounded-2xl shadow-lg p-8 sticky top-6 border-2" style={{ borderColor: '#d9f99d' }}>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 Summary
               </h2>
 
-              <div className="space-y-2 border-b border-gray-200 pb-5 mb-5 max-h-48 overflow-y-auto">
+              <div className="space-y-3 border-b-2 pb-6 mb-6" style={{ borderColor: '#d9f99d' }}>
                 {items.map((item) => {
                   const quantity = item.qty || item.quantity || 1;
                   return (
-                    <div key={item.barcode || item.name} className="flex justify-between items-center p-3 rounded-xl bg-gray-50">
+                    <div key={item.barcode || item.name} className="flex justify-between items-center p-3 rounded-lg border" style={{ borderColor: '#d9f99d', backgroundColor: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', transition: 'all 0.3s ease' }}>
                       <div>
                         <p className="font-semibold text-gray-800 text-sm">{item.name}</p>
                         <p className="text-xs text-gray-500">Qty: {quantity}</p>
+                        {item.category && (
+                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#f7fee7', color: '#65a30d' }}>{item.category}</span>
+                        )}
                       </div>
-                      <p className="font-bold text-gray-800">₹{(item.price * quantity).toFixed(2)}</p>
+                      <p className="font-bold text-gray-800">
+                        ₹{(item.price * quantity).toFixed(2)}
+                      </p>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="space-y-2 mb-5 pb-5 border-b border-gray-200">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal:</span>
+              <div className="space-y-3 mb-6 pb-6" style={{ borderBottom: '2px solid #d9f99d' }}>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subtotal:</span>
                   <span className="font-semibold text-gray-800">₹{total.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Tax:</span>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Tax:</span>
                   <span className="font-semibold text-gray-800">₹0.00</span>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 mb-6 border border-green-100">
-                <p className="text-sm font-semibold text-green-700 mb-1">Total Amount</p>
-                <p className="text-4xl font-black text-gray-800">₹{total.toFixed(2)}</p>
+              <div className="rounded-xl p-6 mb-6 border-2" style={{ borderColor: '#d9f99d' }}>
+                <p className="text-sm font-semibold uppercase tracking-wide mb-1 text-gray-600">Total Amount</p>
+                <p className="text-6xl font-black text-gray-800">₹{total.toFixed(2)}</p>
               </div>
 
               <button
-                onClick={paymentMethod === 'razorpay' ? handleRazorpayPayment : handleCashPayment}
+                onClick={
+                  paymentMethod === 'razorpay' ? handleRazorpayPayment : handleCashPayment
+                }
                 disabled={processing}
-                className="w-full btn-modern text-white font-bold py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full text-white font-bold transition flex items-center justify-center gap-1"
+                style={{ padding: '3px 16px', fontSize: '10px', minHeight: '12px', borderRadius: '8px', backgroundColor: processing ? '#9ca3af' : '#84cc16' }}
+                onMouseEnter={(e) => { if (!processing) e.target.style.backgroundColor = '#65a30d'; }}
+                onMouseLeave={(e) => { if (!processing) e.target.style.backgroundColor = '#84cc16'; }}
               >
                 {processing ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <svg className="w-5 h-5 animate-spin" fill="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="1" fill="white" />
+                      <path fillRule="evenodd" d="M12 19a7 7 0 100-14 7 7 0 000 14zm0 2a9 9 0 110-18 9 9 0 010 18z" opacity="0.2" />
+                    </svg>
                     Processing...
                   </>
                 ) : (
@@ -376,17 +388,20 @@ export default function PaymentPage() {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                     </svg>
-                    Confirm Payment
+                    Confirm
                   </>
                 )}
               </button>
-
+<br></br>
               <button
                 onClick={() => navigate(-1)}
-                className="w-full mt-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                className="w-full mt-2 text-gray-800 font-semibold rounded-lg transition flex items-center justify-center gap-2"
+                style={{ padding: '3px 18px', fontSize: '8px', borderRadius: '8px', backgroundColor: '#e5e7eb' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#d1d5db'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#e5e7eb'}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
                 </svg>
                 Go Back
               </button>
