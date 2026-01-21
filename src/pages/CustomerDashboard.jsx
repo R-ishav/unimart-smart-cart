@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCartById, fetchTransactions, removeFromCart, scanBarcode } from '../services/api';
 import breadImg from '../assets/bread.png';
 import milkImg from '../assets/milk.png';
+import hideandseekImg from '../assets/hideandseek.png';
+import waterImg from '../assets/Water-Bottle-Transparent-Background-PNG.png';
+import chocolateImg from '../assets/Chocolate-Bar-PNG-Background-Image.png';
+import noodlesImg from '../assets/Noodles-Transparent-Image.png';
 
 export default function CustomerDashboard() {
   const { cartId } = useParams();
@@ -202,7 +206,7 @@ export default function CustomerDashboard() {
                         {/* Product Image */}
                         <div className="w-full flex items-center justify-center" style={{ height: '110px', overflow: 'hidden', borderRadius: '16px 16px 0 0' }}>
                           <img 
-                            src={item.name.toLowerCase().includes('bread') ? breadImg : item.name.toLowerCase().includes('milk') ? milkImg : undefined}
+                            src={item.barcode === '8901719117220' ? hideandseekImg : item.barcode === '8908005971009' ? waterImg : item.barcode === '7622202325908' ? chocolateImg : item.barcode === '8901058014235' ? noodlesImg : item.name.toLowerCase().includes('bread') ? breadImg : item.name.toLowerCase().includes('milk') ? milkImg : undefined}
                             alt={item.name}
                             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                           />
