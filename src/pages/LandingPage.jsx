@@ -114,7 +114,7 @@ export default function LandingPage() {
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#65a30d'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = '#84cc16'}
               >
-                <img src={scannerIcon} alt="Scanner" style={{ width: '24px', height: '24px' }} />
+                <img src={scannerIcon} alt="Scanner" style={{ width: '40px', height: '40px' }} />
               </button>
             ) : (
               <button
