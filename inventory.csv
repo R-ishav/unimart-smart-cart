@@ -15,17 +15,17 @@ barcode,name,category,price
 8901000000062,Salt 1kg,Essentials,25
 8901000000071,Tea 250g,Beverages,150
 8901000000072,Coffee 200g,Beverages,275
-8901000000081,Biscuits,Snacks,30
-8901000000082,Chips,Snacks,35
-8901000000083,Chocolate Bar,Snacks,45
-8901000000091,Apple (1kg),Fruits,180
-8901000000092,Banana (dozen),Fruits,50
-8901000000093,Orange (1kg),Fruits,120
-8901000000101,Potato (1kg),Vegetables,40
+8901058014235,Maggi,Noodles,10
+8908020463176,Crax Chips,Snacks,5
+7622202325908,Bournville,Snacks,134
+8901491502030,Lays,Chips,5
+8906010502232,Punjabi Tadka,Chips,5
+8901719117220,Hide&Seek,Biscuits,60
+8905507011424,Cookies,Biscuits,36
 8901000000102,Onion (1kg),Vegetables,35
 8901000000103,Tomato (1kg),Vegetables,45
 1234567890123,Test Product,Testing,99
 0000000000001,Demo Item 1,Demo,10
-0000000000002,Demo Item 2,Demo,20
-42204091,Nivea,Beauty,200
-8908005971009,Water,Beverage,30
+8904238301934,Fogg,Deodorant,299
+42204091,Nivea,Beauty,250
+8908005971009,Water,Beverage,20
